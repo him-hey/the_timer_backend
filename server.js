@@ -13,6 +13,7 @@ app.use(express.json());
 //DB connection 
 mongoose.connect(DB_URL + DB_NAME);
 
+//------------------PRODUCTS ROUTE---------------------------------//
 
 //get all the products
 app.get("/products", (req, res)=>{
@@ -22,6 +23,17 @@ app.get("/products", (req, res)=>{
     })
     .catch((error)=>{console.log(error)});
 })
+
+//get product detail
+app.get("/product", (req, res)=>{
+    productModel.productModel.findById(req.query.id)
+    .then((result)=>{
+        res.send(result);
+    })
+    .catch((error)=>{console.log(error)});
+})
+
+//----------------------------START SERVER-------------------------//
 app.listen(PORT, (()=>{
     console.log("http://localhost:" + PORT);
 }))
