@@ -33,6 +33,15 @@ app.get("/product", (req, res)=>{
     .catch((error)=>{console.log(error)});
 })
 
+//add product
+app.post("/addProduct", (req, res)=>{
+    productModel.productModel.create(req.body)
+    .then((result)=>{
+        res.send("product added!");
+    })
+    .catch((error)=>{console.log(error)});
+})
+
 //----------------------------START SERVER-------------------------//
 app.listen(PORT, (()=>{
     console.log("http://localhost:" + PORT);
