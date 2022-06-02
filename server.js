@@ -1,11 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const PORT = process.env.PORT;
 const DB_URL = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 const productModel = require("./models/product_model");
+const userModel = require("./models/user_model");
 const app = express();
 
 app.use(express.json());
@@ -40,6 +42,50 @@ app.post("/addProduct", (req, res)=>{
         res.send("product added!");
     })
     .catch((error)=>{console.log(error)});
+})
+
+//------------------------AUTHENTICATION--------------------------//
+
+
+//login function with username and password
+app.post('/login', async (req, res)=>{
+    let user = null;
+    userModel.userModel.findOne({username:req.body.username})
+    .then( async (result)=>{
+        user = result.username;
+        if(user == null){
+            return res.status(400).send("cannot find the user!");
+        }
+        try{
+            if( await bcrypt.compare(req.body.password, result.password)){
+                res.send("successed...");
+            }else{
+                res.send("cannot login");
+            }
+        } 
+        catch{
+            res.status(500).send()
+        }
+    })
+})
+
+//register function with username, email and password
+app.post('/register', async (req, res)=>{
+    try{
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        let user = {username: req.body.username, email: req.body.email, password: hashedPassword};
+        userModel.userModel.create(user)
+        .then((result)=>{res.status(200).send("Register successed!")})
+       
+    }
+    catch{
+        res.status(500).send();
+    }
+})
+
+//logout function
+app.post('/logout', (req, res)=>{
+    
 })
 
 //----------------------------START SERVER-------------------------//
